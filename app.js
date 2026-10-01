@@ -195,6 +195,8 @@ function viewProduct(productId) {
 
     if (product) {
 
+        addToRecentlyViewed(product);
+
         alert(
             `${product.name}\n\n` +
             `Brand: ${product.brand}\n` +
@@ -204,7 +206,6 @@ function viewProduct(productId) {
 
     }
 }
-
 
 
 
@@ -393,3 +394,125 @@ topK.addEventListener("change", displayPopularProducts);
 
 
 displayPopularProducts();
+
+const recentProductsContainer =
+    document.getElementById("recentProducts");
+
+const clearHistoryBtn =
+    document.getElementById("clearHistoryBtn");
+
+
+const recentHistory = [];
+
+const recentHistorySet = new Set();
+
+
+function addToRecentlyViewed(product) {
+
+    if (recentHistorySet.has(product.id)) {
+
+        const oldIndex =
+            recentHistory.findIndex(
+                item => item.id === product.id
+            );
+
+        recentHistory.splice(oldIndex, 1);
+
+    } else {
+
+        recentHistorySet.add(product.id);
+
+    }
+
+
+    recentHistory.unshift(product);
+
+
+    if (recentHistory.length > 5) {
+
+        const removedProduct =
+            recentHistory.pop();
+
+        recentHistorySet.delete(
+            removedProduct.id
+        );
+
+    }
+
+
+    displayRecentlyViewed();
+}
+
+
+function displayRecentlyViewed() {
+
+    recentProductsContainer.innerHTML = "";
+
+
+    if (recentHistory.length === 0) {
+
+        recentProductsContainer.innerHTML = `
+            <p class="message">
+                No recently viewed products.
+            </p>
+        `;
+
+        return;
+    }
+
+
+    recentHistory.forEach(product => {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "product-card recent-card";
+
+
+        card.innerHTML = `
+
+            <h3>${product.name}</h3>
+
+            <p>
+                <strong>Brand:</strong>
+                ${product.brand}
+            </p>
+
+            <p class="price">
+                ₹${product.price.toLocaleString("en-IN")}
+            </p>
+
+            <p class="rating">
+                ⭐ ${product.rating}
+                (${product.reviews} reviews)
+            </p>
+
+            <button
+                class="view-btn"
+                onclick="viewProduct('${product.id}')"
+            >
+                View Product
+            </button>
+
+        `;
+
+
+        recentProductsContainer.appendChild(card);
+
+    });
+}
+
+
+clearHistoryBtn.addEventListener("click", () => {
+
+    recentHistory.length = 0;
+
+    recentHistorySet.clear();
+
+    displayRecentlyViewed();
+
+});
+
+
+displayRecentlyViewed();
