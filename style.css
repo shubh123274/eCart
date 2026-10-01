@@ -152,6 +152,21 @@ main {
     .search-box button {
         width: 100%;
     }
+
+    .popular-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .top-k-box {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .top-k-box select {
+        flex: 1;
+    }
 }
 
 .range-search {
@@ -191,4 +206,51 @@ main {
 
 .range-inputs button:hover {
     background: #15803d;
+}
+
+.popular-section {
+    margin-top: 40px;
+}
+
+.popular-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.top-k-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.top-k-box label {
+    font-weight: bold;
+}
+
+.top-k-box select {
+    padding: 8px 14px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.popular-card {
+    position: relative;
+}
+
+.rank {
+    display: inline-block;
+    background: #111827;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.popular-card .rating {
+    color: #f59e0b;
 }

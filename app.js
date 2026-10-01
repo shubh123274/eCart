@@ -300,3 +300,96 @@ rangeSearchBtn.addEventListener("click", () => {
     displayProducts(matchingProducts);
 
 });
+
+const topK = document.getElementById("topK");
+const popularProductsContainer =
+    document.getElementById("popularProducts");
+
+
+function getPopularProducts(k) {
+
+    const productsWithPopularity = allProducts.map(product => {
+
+        return {
+            ...product,
+            popularity: product.rating * product.reviews
+        };
+
+    });
+
+
+    productsWithPopularity.sort(
+        (a, b) => b.popularity - a.popularity
+    );
+
+
+    return productsWithPopularity.slice(0, k);
+}
+
+
+
+function displayPopularProducts() {
+
+    const k = Number(topK.value);
+
+    const popularProducts = getPopularProducts(k);
+
+    popularProductsContainer.innerHTML = "";
+
+
+    popularProducts.forEach((product, index) => {
+
+        const card = document.createElement("div");
+
+        card.className = "product-card popular-card";
+
+
+        card.innerHTML = `
+
+            <div class="rank">
+                #${index + 1}
+            </div>
+
+            <h3>${product.name}</h3>
+
+            <p>
+                <strong>Brand:</strong>
+                ${product.brand}
+            </p>
+
+            <p class="price">
+                ₹${product.price.toLocaleString("en-IN")}
+            </p>
+
+            <p class="rating">
+                ⭐ ${product.rating}
+                (${product.reviews} reviews)
+            </p>
+
+            <p>
+                <strong>Popularity:</strong>
+                ${product.popularity.toLocaleString("en-IN")}
+            </p>
+
+            <button
+                class="view-btn"
+                onclick="viewProduct('${product.id}')"
+            >
+                View Product
+            </button>
+
+        `;
+
+
+        popularProductsContainer.appendChild(card);
+
+    });
+
+}
+
+
+
+topK.addEventListener("change", displayPopularProducts);
+
+
+displayPopularProducts();
