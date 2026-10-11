@@ -6,7 +6,7 @@
 
 body {
     font-family: Arial, sans-serif;
-    background: #f5f6fa;
+    background: bisque;
     color: #222;
 }
 
@@ -292,4 +292,138 @@ main {
 
 .recent-card {
     position: relative;
+}
+
+
+.cart-section {
+    margin-top: 40px;
+    padding: 25px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.cart-section h2 {
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.cart-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.cart-actions button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 7px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cart-actions button:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.cart-actions button:disabled {
+    background: #d1d5db;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+.cart-summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+#cart-items {
+    display: grid;
+    gap: 12px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.cart-item h3 {
+    flex: 1 1 180px;
+    font-size: 16px;
+}
+
+.cart-item p {
+    color: #2563eb;
+    font-weight: bold;
+}
+
+.cart-item button {
+    padding: 7px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #e5e7eb;
+    cursor: pointer;
+}
+
+.cart-item button:hover {
+    background: #d1d5db;
+}
+
+.cart-item button:last-child {
+    background: #dc2626;
+    color: white;
+}
+
+.cart-item button:last-child:hover {
+    background: #b91c1c;
+}
+
+#cart-history {
+    padding-left: 22px;
+    margin-top: 12px;
+    color: #4b5563;
+}
+
+#cart-history li {
+    margin-bottom: 6px;
+}
+
+.empty-cart {
+    padding: 20px;
+    text-align: center;
+    color: #6b7280;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+@media (max-width: 600px) {
+    .cart-section {
+        padding: 16px;
+    }
+
+    .cart-item {
+        gap: 8px;
+    }
+
+    .cart-item h3 {
+        flex-basis: 100%;
+    }
+
+    .cart-summary {
+        flex-direction: column;
+    }
 }
