@@ -694,3 +694,136 @@ undoBtn.addEventListener("click", undoCart);
 redoBtn.addEventListener("click", redoCart);
 
 displayCart();
+
+
+// Challenge 5: Personalized Recommendations
+
+const recommendationContainer =
+    document.getElementById("recommendationProducts");
+
+const refreshRecommendationsBtn =
+    document.getElementById("refreshRecommendationsBtn");
+
+function getRecommendations() {
+    // Recently viewed product IDs ko exclude karo
+    const viewedIds = new Set(
+        recentHistory.map(product => String(product.id))
+    );
+
+    // Recently viewed products se related brand/category identify karo
+    const viewedProducts = [...recentHistory];
+
+    if (viewedProducts.length === 0) {
+        return allProducts.slice(0, 3);
+    }
+
+    const recommended = allProducts
+        .filter(product => !viewedIds.has(String(product.id)))
+        .map(product => {
+            let score = 0;
+
+            viewedProducts.forEach(viewed => {
+                if (product.brand === viewed.brand) {
+                    score += 3;
+                }
+
+                if (product.category &&
+                    product.category === viewed.category) {
+                    score += 5;
+                }
+
+                if (product.subcategory &&
+                    product.subcategory === viewed.subcategory) {
+                    score += 4;
+                }
+            });
+
+            return { ...product, recommendationScore: score };
+        });
+
+    recommended.sort(
+        (a, b) =>
+            b.recommendationScore - a.recommendationScore ||
+            b.rating - a.rating
+    );
+
+    return recommended.slice(0, 3);
+}
+
+function displayRecommendations() {
+    const recommendations = getRecommendations();
+
+    recommendationContainer.innerHTML = "";
+
+    if (recommendations.length === 0) {
+        recommendationContainer.innerHTML =
+            '<p class="message">No recommendations available.</p>';
+        return;
+    }
+
+    recommendations.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+
+        const heading = document.createElement("h3");
+        heading.textContent = product.name;
+
+        const brand = document.createElement("p");
+        brand.textContent = `Brand: ${product.brand}`;
+
+        const price = document.createElement("p");
+        price.className = "price";
+        price.textContent =
+            `₹${product.price.toLocaleString("en-IN")}`;
+
+        const rating = document.createElement("p");
+        rating.className = "rating";
+        rating.textContent =
+            `⭐ ${product.rating} (${product.reviews} reviews)`;
+
+        const reason = document.createElement("p");
+        reason.className = "recommendation-reason";
+        reason.textContent =
+            "Recommended based on popularity and your interests.";
+
+        const viewButton = document.createElement("button");
+        viewButton.className = "view-btn";
+        viewButton.textContent = "View Product";
+        viewButton.onclick = () => {
+            viewProduct(product.id);
+            displayRecommendations();
+        };
+
+        const addButton = document.createElement("button");
+        addButton.className = "add-cart-btn";
+        addButton.textContent = "Add to Cart";
+        addButton.onclick = () => addToCart(product.id);
+
+        card.append(
+            heading,
+            brand,
+            price,
+            rating,
+            reason,
+            viewButton,
+            addButton
+        );
+
+        recommendationContainer.appendChild(card);
+    });
+}
+
+refreshRecommendationsBtn.addEventListener(
+    "click",
+    displayRecommendations
+);
+
+// Recently Viewed change hone par recommendations update karo
+const originalAddToRecentlyViewed = addToRecentlyViewed;
+
+addToRecentlyViewed = function(product) {
+    originalAddToRecentlyViewed(product);
+    displayRecommendations();
+};
+
+displayRecommendations();
