@@ -175,6 +175,10 @@ function displayProducts(products) {
                 View Product
             </button>
 
+            <button onclick="addToCart('${product.id}')">
+    Add to Cart
+</button>
+
         `;
 
 
@@ -379,6 +383,10 @@ function displayPopularProducts() {
                 View Product
             </button>
 
+            <button onclick="addToCart('${product.id}')">
+    Add to Cart
+</button>
+
         `;
 
 
@@ -495,6 +503,10 @@ function displayRecentlyViewed() {
                 View Product
             </button>
 
+            <button onclick="addToCart('${product.id}')">
+    Add to Cart
+</button>
+
         `;
 
 
@@ -516,3 +528,169 @@ clearHistoryBtn.addEventListener("click", () => {
 
 
 displayRecentlyViewed();
+
+
+const cartItemsContainer = document.getElementById("cart-items");
+const cartCount = document.getElementById("cart-count");
+const cartTotal = document.getElementById("cart-total");
+const undoBtn = document.getElementById("undo-btn");
+const redoBtn = document.getElementById("redo-btn");
+const cartHistory = document.getElementById("cart-history");
+
+let cart = [];
+let undoStack = [];
+let redoStack = [];
+let operationHistory = [];
+
+function saveCartState(action) {
+    undoStack.push(JSON.stringify(cart));
+    redoStack = [];
+    operationHistory.push(action);
+    displayCart();
+}
+
+function addToCart(productId) {
+    const product = allProducts.find(
+        item => String(item.id) === String(productId)
+    );
+
+    if (!product) return;
+
+    saveCartState(`Added ${product.name}`);
+
+    const existing = cart.find(
+        item => String(item.id) === String(productId)
+    );
+
+    if (existing) {
+        existing.quantity++;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
+
+    displayCart();
+}
+
+function changeQuantity(productId, amount) {
+    const item = cart.find(
+        product => String(product.id) === String(productId)
+    );
+
+    if (!item) return;
+
+    saveCartState(
+        `${amount > 0 ? "Increased" : "Decreased"} quantity of ${item.name}`
+    );
+
+    item.quantity += amount;
+
+    if (item.quantity <= 0) {
+        cart = cart.filter(
+            product => String(product.id) !== String(productId)
+        );
+    }
+
+    displayCart();
+}
+
+function removeFromCart(productId) {
+    const item = cart.find(
+        product => String(product.id) === String(productId)
+    );
+
+    if (!item) return;
+
+    saveCartState(`Removed ${item.name}`);
+
+    cart = cart.filter(
+        product => String(product.id) !== String(productId)
+    );
+
+    displayCart();
+}
+
+function undoCart() {
+    if (undoStack.length === 0) return;
+
+    redoStack.push(JSON.stringify(cart));
+    cart = JSON.parse(undoStack.pop());
+    operationHistory.push("Undo operation");
+    displayCart();
+}
+
+function redoCart() {
+    if (redoStack.length === 0) return;
+
+    undoStack.push(JSON.stringify(cart));
+    cart = JSON.parse(redoStack.pop());
+    operationHistory.push("Redo operation");
+    displayCart();
+}
+
+function displayCart() {
+    cartItemsContainer.innerHTML = "";
+
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML =
+            '<p class="empty-cart">Your cart is empty.</p>';
+    }
+
+    let totalItems = 0;
+    let totalPrice = 0;
+
+    cart.forEach(item => {
+        totalItems += item.quantity;
+        totalPrice += item.price * item.quantity;
+
+        const row = document.createElement("div");
+        row.className = "cart-item";
+
+        const name = document.createElement("h3");
+        name.textContent = item.name;
+
+        const price = document.createElement("p");
+        price.textContent =
+            `₹${item.price.toLocaleString("en-IN")} × ${item.quantity}`;
+
+        const decrease = document.createElement("button");
+        decrease.textContent = "−";
+        decrease.onclick = () => changeQuantity(item.id, -1);
+
+        const quantity = document.createElement("span");
+        quantity.textContent = ` ${item.quantity} `;
+
+        const increase = document.createElement("button");
+        increase.textContent = "+";
+        increase.onclick = () => changeQuantity(item.id, 1);
+
+        const remove = document.createElement("button");
+        remove.textContent = "Remove";
+        remove.onclick = () => removeFromCart(item.id);
+
+        row.append(name, price, decrease, quantity, increase, remove);
+        cartItemsContainer.appendChild(row);
+    });
+
+    cartCount.textContent = totalItems;
+    cartTotal.textContent = totalPrice.toLocaleString("en-IN");
+
+    undoBtn.disabled = undoStack.length === 0;
+    redoBtn.disabled = redoStack.length === 0;
+
+    cartHistory.innerHTML = "";
+
+    if (operationHistory.length === 0) {
+        cartHistory.innerHTML = "<li>No operations yet.</li>";
+    } else {
+        operationHistory.slice(-10).forEach(action => {
+            const li = document.createElement("li");
+            li.textContent = action;
+            cartHistory.appendChild(li);
+        });
+    }
+}
+
+undoBtn.addEventListener("click", undoCart);
+redoBtn.addEventListener("click", redoCart);
+
+displayCart();
